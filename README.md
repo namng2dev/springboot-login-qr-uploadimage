@@ -1,12 +1,6 @@
 # springboot-login-qr-uploadimage
 Hướng dẫn:
-Các chức năng:
-Tạo 1 tài khoản
-Xóa tài khoản
-Thay đổi mật khẩu
-Tự động gửi email
-Tự động sinh mã QR
-Upload ảnh
+Các chức năng:Tạo 1 tài khoản,Xóa tài khoản,Thay đổi mật khẩu,Tự động gửi email,Tự động sinh mã QR,Upload ảnh
 
 Mô tả chương trình:
 Chương trình này tạo ra 1 khung đăng nhập để mở tài khoản nhanh cho 1 ngân hàng.

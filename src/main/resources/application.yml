@@ -1,0 +1,21 @@
+# Email
+spring:
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: namng2307@gmail.com
+    password: onpmyckuemsvtmjy
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    test-connection: false
+    protocol: smtp
+
+
+
+
+

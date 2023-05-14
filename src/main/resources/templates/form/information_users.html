@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Information</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #343a40;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+        }
+
+        .green-text {
+            color: green;
+        }
+
+        .red-text {
+            color: red;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-container button {
+            flex: 1;
+            margin: 0 5px;
+            border-radius: 50px;
+            font-size: 16px;
+            padding: 12px;
+        }
+
+        .btn-container .btn-primary {
+            background-color: #d1e7dd;
+            color: #155724;
+        }
+
+        .btn-container .btn-success {
+            background-color: #c3e6cb;
+            color: #155724;
+        }
+
+    </style>
+</head>
+<body>
+
+<img th:if="${QRCodeGenerated}" th:src="@{'/getImage/' + ${user.phoneNumber} + 'QRcodeImage.png'}" alt="QR Code">
+
+<div class="container">
+    <div th:if="${QRCodeGenerated}" style="color: green;">Mã QR được tạo thành công</div>
+    <div th:if="${QRCodeFailed}" style="color: red;">Không tạo được mã QR. Hãy thực hiện trong 1 phiên đăng nhập</div>
+
+    <div th:if="${updateActivateSuccess}" style="color: green;">Bạn đã update ảnh thành công.Nếu trạng thái tài khoản vẫn là "chưa xác thực" Bạn cần login lại để hiển thị thông tin chính xác</div>
+    <h1 class="mt-5">Đây là thông tin của bạn:</h1>
+    <ul class="mt-4">
+        <li>Họ và tên: <span th:text="${user.fullName}"></span></li>
+        <li>Số điện thoại: <span th:text="${user.phoneNumber}"></span></li>
+        <li>Email: <span th:text="${user.email}"></span></li>
+        <li>Số tài khoản: <span th:text="${user.accountNumber}"></span></li>
+    </ul>
+
+
+    <div class="list-group-item">
+        Trạng thái kích hoạt tài khoản:
+        <span th:if="${user.activate}" class="green-text">Đã xác thực</span>
+        <span th:unless="${user.activate}" class="red-text">Chưa xác thực hình ảnh</span>
+    </div>
+
+    <div class="btn-container">
+
+        <form action="/generate-qr-code" method="post">
+            <button class="btn btn-primary" type="submit">Tạo mã QR</button>
+        </form>
+
+        <a href="/upload-image" class="btn btn-success">Upload ảnh</a>
+
+        <form action="/delete/byPhoneNumber" method="post" id="deleteForm">
+            <input type="hidden" name="phoneNumber" th:value="${user.phoneNumber}">
+            <button class="btn btn-danger" type="submit">Xóa tài khoản</button>
+        </form>
+
+    </div>
+</div>
+</body>
+</html>
+

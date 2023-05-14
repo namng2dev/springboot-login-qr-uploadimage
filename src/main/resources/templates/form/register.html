@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js">
+    <title>Đăng kí mở tài khoản</title>
+</head>
+
+<body>
+<div id="wrapper">
+    <div class="container">
+        <div class="row justify-content-around">
+            <form th:action="@{/create/new-users}" method="post" class="col-md-6 bg-light p-3 my-3">
+                <h1 class="text-center text-uppercase h3 py-3">
+                    Đăng kí tài khoản ngân hàng
+                </h1>
+                <div class="form-group">
+                    <label for="fullName">Họ và tên</label>
+                    <input type="text" name="fullName" id="fullName" class="form-control" required
+                           oninput="validateFullname(this)">
+                    <div id="fullnameError" style="display: none; color: red;">Tên không hợp lệ</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Số điện thoại</label>
+                    <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control" pattern="[0-9]{10}"
+                           title="Số điện thoại không hợp lệ" required oninput="validatePhoneNumber(this)">
+                    <div id="phonenumberError" style="display: none; color: red;">Số điện thoại không hợp lệ</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-group">
+                        <input type="text" name="password" id="password" class="form-control" required
+                               oninput="isValidPassword(this)">
+                    </div>
+                    <div id="passwordError" style="display: none; color: red;">Mật khẩu không hợp lệ. Yêu cầu ít
+                        nhất 6 kí tự, bao gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 kí hiệu.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Bạn có muốn chọn số điện thoại làm tài khoản thanh toán không?</label>
+                    <div>
+                        <div class="form-check">
+                            <input type="radio" name="radio" id="yes" value="yes" class="form-check-input" checked>
+                            <label for="yes" class="form-check-label">Có (Miễn phí)</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-check">
+                            <input type="radio" name="radio" id="no" value="no" class="form-check-input">
+                            <label for="no" class="form-check-label">Không (Chọn số tùy ý làm số tài khoản)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="accountGroup" style="display: none;">
+                    <label for="accountNumber">Nhập số tài khoản mong muốn</label>
+                    <input type="text" name="accountNumber" id="accountNumber" class="form-control" pattern="[0-9]{10}"
+                           title="Số tài khoản chỉ gồm 10 chữ số" oninput="validateAccountNumber(this)">
+                    <div id="accountError" style="display: none; color: red;">Vui lòng nhập đúng 10 chữ số</div>
+                </div>
+
+                <input type="submit" value="Đăng kí" class="btn-primary btn w-100 my-3">
+                <div th:if="${phoneNumberExist}" style="color: red;">Số điện thoại đã được đăng kí,hãy thử 1 số điện thoại khác</div>
+                <div th:if="${accountNumberExist}" style="color: red;">Số tài khoản đã được đăng kí,hãy thử 1 số tài khoản khác</div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // check valid name
+    function validateFullname(input) {
+        var fullname = input.value;
+        var fullnameError = document.getElementById('fullnameError');
+    
+        if (/\d/.test(fullname)) {
+            fullnameError.style.display = 'block';
+        } else {
+            fullnameError.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('fullName').addEventListener('input', function () {
+        validateFullname(this);
+    });
+    
+    // check valid phone number
+    function validatePhoneNumber(input) {
+        var phoneNumber = input.value;
+        var phoneNumberError = document.getElementById('phonenumberError');
+    
+        if (phoneNumber.length !== 10 || !isValidPhoneNumber(phoneNumber)) {
+            phoneNumberError.style.display = 'block';
+        } else {
+            phoneNumberError.style.display = 'none';
+        }
+    }
+    
+    function isValidPhoneNumber(phoneNumber) {
+        var phoneRegex = /^0[0-9]{9}$/;
+        return phoneRegex.test(phoneNumber);
+    }
+    
+    document.getElementById('phoneNumber').addEventListener('input', function () {
+        validatePhoneNumber(this);
+    });
+    
+    // check valid password
+    function isValidPassword(password) {
+        if (password.length < 6) {
+            return false;
+        }
+    
+        if (!/[A-Z]/.test(password)) {
+            return false;
+        }
+    
+        if (!/[a-z]/.test(password)) {
+            return false;
+        }
+    
+        if (!/\d/.test(password)) {
+            return false;
+        }
+    
+        if (!/[-+_!@#$%^&*.,?]/.test(password)) {
+            return false;
+        }
+    
+        return true;
+    }
+    
+    document.getElementById('password').addEventListener('input', function () {
+        var password = this.value;
+        var passwordError = document.getElementById('passwordError');
+    
+        if (!isValidPassword(password)) {
+            passwordError.style.display = 'block';
+        } else {
+            passwordError.style.display = 'none';
+        }
+    });
+    
+    // display account number form
+    document.addEventListener('DOMContentLoaded', function() {
+        const radioButtons = document.getElementsByName('radio');
+        const accountGroup = document.getElementById('accountGroup');
+    
+        radioButtons.forEach(function(radioButton) {
+            radioButton.addEventListener('change', function() {
+                if (this.value === 'no') {
+                    accountGroup.style.display = 'block';
+                } else {
+                    accountGroup.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // check valid account number
+    function validateAccountNumber(input) {
+        var accountNumber = input.value;
+        var accountError = document.getElementById('accountError');
+    
+        if (accountNumber.length !== 10 || isNaN(accountNumber)) {
+            accountError.style.display = 'block';
+        } else {
+            accountError.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('accountNumber').addEventListener('input', function () {
+        validateAccountNumber(this);
+    });
+    </script>
+    
+
+
+</body>
+</html>

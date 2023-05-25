@@ -15,7 +15,11 @@ spring:
     test-connection: false
     protocol: smtp
 
-
+  # Upload image max size upload 2MB
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
 
 
 

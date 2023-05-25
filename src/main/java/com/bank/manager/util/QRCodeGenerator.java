@@ -6,12 +6,14 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.Getter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,14 +29,18 @@ public class QRCodeGenerator {
     private static final int HEIGHT_IMAGE_QR_CODE = 150;
 
     // Create a folder to save all QR code images.
-    private final Path storageFolder = Paths.get("QRCodeImageFolder");
+    private final String STORAGE_IMAGE_QR_FOLDER = "QRCodeImageFolder";
 
-    public QRCodeGenerator() {
-        try {
-            Files.createDirectories(storageFolder);
-        } catch (IOException exception) {
-            throw new RuntimeException("Cannot initialize storage", exception);
+    @Bean("qr")
+    public void init() {
+        File directory = new File(STORAGE_IMAGE_QR_FOLDER); // Create folder image
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
+    }
+
+    public String getStorageImageQRFolder() {
+        return STORAGE_IMAGE_QR_FOLDER;
     }
 
     public String generateQRCodeTypeBase64(Users users) {
@@ -75,7 +81,7 @@ public class QRCodeGenerator {
             BufferedImage bufferedImage = ImageIO.read(inputStream);
 
             String fileName = phoneNumber + "QRcodeImage.png";   // example: 0393298480QRcodeImage.png
-            Path outputFile = storageFolder.resolve(fileName);
+            Path outputFile = Paths.get(STORAGE_IMAGE_QR_FOLDER).resolve(fileName);
             ImageIO.write(bufferedImage, "png", outputFile.toFile());
 
         } catch (IOException e) {

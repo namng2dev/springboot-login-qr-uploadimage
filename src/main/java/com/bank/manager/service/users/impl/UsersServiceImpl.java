@@ -88,7 +88,7 @@ public class UsersServiceImpl implements UsersService {
     public ResponseEntity<BaseResponse> deleteUsersByPhoneNumber(Users currentUsers) {
         usersRepository.deleteByPhoneNumber(currentUsers.getPhoneNumber());      // Delete User by phone number
         qrCodeService.deleteQRCodeImage(currentUsers.getPhoneNumber());          // Delete QR code information users
-        uploadImageService.deleteUserImage(currentUsers.getPhoneNumber());       // Delete image
+        uploadImageService.deleteUserImage(currentUsers.getPhoneNumber());       // Delete imagea
 
         return ResponseEntity.ok().body(new BaseResponse(true, "OK", "delete users successful"));
     }

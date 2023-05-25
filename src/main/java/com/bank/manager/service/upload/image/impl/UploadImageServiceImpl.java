@@ -2,37 +2,42 @@ package com.bank.manager.service.upload.image.impl;
 
 import com.bank.manager.service.upload.image.UploadImageService;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 
 @Service
 public class UploadImageServiceImpl implements UploadImageService {
-    private final Path storageFolder = Paths.get("ImageFolder");
+    private final String STORAGE_IMAGE_FOLDER = "ImageFolder";
 
-    public UploadImageServiceImpl() {
-        try {
-            Files.createDirectories(storageFolder);
-
-        } catch (IOException exception) {
-            throw new RuntimeException("Can not initialize storage", exception);
+    @Bean("image")
+    public void init() {
+        File directory = new File(STORAGE_IMAGE_FOLDER); // Create folder image
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
     }
 
-    public boolean isImageFile(MultipartFile file) {
-        String imageExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+    private boolean isImageFile(MultipartFile file) {
+        try {
+            BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
+            return bufferedImage != null;
 
-        return Arrays.asList(new String[]{"png", "jpg", "jpeg", "bmp"}).contains(imageExtension.trim().toLowerCase());
+        } catch (IOException exception) {
+            throw new RuntimeException("file is not an image", exception);
+        }
     }
 
-    public float getSize(MultipartFile file) {
+    private float getSize(MultipartFile file) {
         return file.getSize();
     }
 
@@ -53,19 +58,14 @@ public class UploadImageServiceImpl implements UploadImageService {
 
             String fileName = phoneNumber + "Image." + FilenameUtils.getExtension(file.getOriginalFilename());  // example: 0393298480Image.png
 
-            Path destinationFilePath = this.storageFolder.resolve(Paths.get(fileName)).normalize().toAbsolutePath();
+            File outputFile = new File(STORAGE_IMAGE_FOLDER + File.separator + fileName);
 
-            if (!Files.exists(destinationFilePath.getParent())) {
-                Files.createDirectories(destinationFilePath.getParent());
-            }
-
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFilePath, StandardCopyOption.REPLACE_EXISTING);
-            }
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            FileCopyUtils.copy(file.getInputStream(), fileOutputStream);
+            fileOutputStream.close();
 
             return fileName;
         } catch (IOException exception) {
-            exception.printStackTrace();
             throw new RuntimeException("store file failed");
         }
     }
@@ -73,7 +73,7 @@ public class UploadImageServiceImpl implements UploadImageService {
     @Override
     public void deleteUserImage(String phoneNumber) {
         try {
-            Files.list(storageFolder)
+            Files.list(Paths.get(STORAGE_IMAGE_FOLDER))
                     .filter(Files::isRegularFile)
                     .forEach(file -> {
                         String fileName = file.getFileName().toString();
